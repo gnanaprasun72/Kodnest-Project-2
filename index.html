@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Manga-themed greeting app — an anime character personally welcomes you with a hello!" />
+    <title>✨ Manga Greeting App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Outfit:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <!-- ── Screentone background dots overlay ── -->
+    <div class="screentone" aria-hidden="true"></div>
+
+    <!-- ── Speed lines burst (manga action lines) ── -->
+    <canvas id="speedCanvas" aria-hidden="true"></canvas>
+
+    <!-- ── Particle / confetti canvas ── -->
+    <canvas id="animCanvas" aria-hidden="true"></canvas>
+
+    <!-- ── Glow burst overlay ── -->
+    <div id="glowBurst" class="glow-burst" aria-hidden="true"></div>
+
+    <!-- ── Floating manga panel decorations ── -->
+    <div class="panel panel-tl" aria-hidden="true">
+        <span class="panel-kanji">こんにちは</span>
+    </div>
+    <div class="panel panel-br" aria-hidden="true">
+        <span class="panel-kanji">やあ！</span>
+    </div>
+
+    <!-- ═══ ANIME CHARACTER + SPEECH BUBBLE ═══ -->
+    <div id="characterWrap" class="character-wrap" aria-hidden="true">
+        <div id="speechBubble" class="speech-bubble">
+            <span id="bubbleText" class="bubble-text"></span>
+            <span class="bubble-name" id="bubbleName"></span>
+        </div>
+        <img id="animeChar" class="anime-char" src="anime_char.png" alt="Anime character waving hello" />
+        <div class="char-shadow"></div>
+    </div>
+
+    <!-- ── Main card ── -->
+    <main class="card" id="mainCard">
+        <!-- manga panel corner marks -->
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+
+        <div class="logo-wrap">
+            <span class="logo-icon">🌸</span>
+            <div class="logo-ring"></div>
+        </div>
+
+        <h1 class="app-title">
+            <span class="title-jp">こんにちは</span>
+            <span class="title-en">GREETING APP</span>
+        </h1>
+        <p class="app-subtitle">Enter your name and meet your anime companion!</p>
+
+        <div class="form-group">
+            <label class="input-label" for="nameInput">Enter Your Name</label>
+            <div class="input-wrapper">
+                <input id="nameInput" class="name-input" type="text" placeholder="Type your name here"
+                    autocomplete="off" spellcheck="false" maxlength="40" />
+                <button id="micBtn" class="mic-btn" aria-label="Use microphone to enter name" title="Speak your name">
+                    <span class="mic-icon">🎤</span>
+                    <span class="mic-pulse"></span>
+                </button>
+            </div>
+            <!-- Voice status bar -->
+            <div id="voiceStatus" class="voice-status" aria-live="polite"></div>
+        </div>
+
+        <!-- Mute toggle -->
+        <div class="voice-controls">
+            <button id="muteBtn" class="mute-btn" aria-label="Toggle voice" title="Toggle voice on/off">
+                <span id="muteIcon">🔊</span>
+                <span class="mute-label">Voice ON</span>
+            </button>
+        </div>
+
+        <button id="greetBtn" class="greet-btn" aria-label="Greet me">
+            <span class="btn-text">Greet!</span>
+            <span class="btn-action-text">やあ！</span>
+            <span class="btn-shine"></span>
+        </button>
+
+        <div id="greetingOutput" class="greeting-output" aria-live="polite"></div>
+
+        <!-- small manga sfx tags -->
+        <div class="sfx-wrap" id="sfxWrap" aria-hidden="true">
+            <span class="sfx" id="sfxTag"></span>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

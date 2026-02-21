@@ -1,0 +1,816 @@
+/* ═══════════════════════════════════════════════════
+   MANGA GREETING APP  –  styles.css
+   ═══════════════════════════════════════════════════ */
+
+/* ── Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Outfit:wght@300;400;600;700;900&display=swap');
+
+/* ── Custom properties ── */
+:root {
+  /* Manga palette */
+  --ink: #0b0a0f;
+  --ink-light: #1a1828;
+  --paper: #f5f0e8;
+  /* off-white manga paper */
+  --paper-dark: #ede5d0;
+  --pink-1: #ff4d8d;
+  --pink-2: #ff90be;
+  --blue-1: #3b4cca;
+  --blue-2: #6c7cff;
+  --gold: #ffd700;
+  --accent: #ff4d8d;
+
+  /* card */
+  --card-bg: rgba(11, 10, 15, 0.88);
+  --card-border: #ff4d8d;
+
+  --radius-lg: 6px;
+  /* manga panels have sharp corners */
+  --radius-md: 4px;
+  --radius-sm: 3px;
+
+  --shadow-card: 4px 4px 0 #ff4d8d, 8px 8px 0 #3b4cca;
+  --shadow-btn: 3px 3px 0 #3b4cca;
+
+  --font-manga: 'Bangers', cursive;
+  --font-body: 'Outfit', sans-serif;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Body ── */
+body {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  background: var(--ink);
+  background-image:
+    radial-gradient(ellipse 100% 70% at 50% -5%, rgba(255, 77, 141, .18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 110%, rgba(59, 76, 202, .20) 0%, transparent 60%);
+  overflow: hidden;
+  color: #fff;
+  position: relative;
+}
+
+/* ── Screentone halftone overlay (manga dots) ── */
+.screentone {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+/* ── Speed-lines canvas ── */
+#speedCanvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ── Particle canvas ── */
+#animCanvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* ── Glow burst ── */
+.glow-burst {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+}
+
+.glow-burst.active {
+  animation: burst 1.4s ease-out forwards;
+}
+
+@keyframes burst {
+  0% {
+    opacity: 0;
+    background: radial-gradient(circle at center, rgba(255, 215, 0, .6) 0%, rgba(255, 77, 141, .35) 30%, transparent 70%);
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── Floating panel decorations ── */
+.panel {
+  position: fixed;
+  width: 110px;
+  padding: 10px 14px;
+  background: var(--ink-light);
+  border: 2.5px solid var(--pink-1);
+  box-shadow: 3px 3px 0 var(--blue-1);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: panelFloat 5s ease-in-out infinite alternate;
+}
+
+.panel-tl {
+  top: 28px;
+  left: 28px;
+  animation-delay: 0s;
+}
+
+.panel-br {
+  bottom: 28px;
+  right: 28px;
+  animation-delay: -2.5s;
+}
+
+@keyframes panelFloat {
+  from {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  to {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+.panel-kanji {
+  font-family: var(--font-manga);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: var(--pink-1);
+  text-shadow: 2px 2px 0 var(--blue-1);
+}
+
+/* ═══════════════════════════════════════════════
+   ANIME CHARACTER
+   ═══════════════════════════════════════════════ */
+.character-wrap {
+  position: fixed;
+  bottom: 0;
+  right: -320px;
+  /* hidden off-screen initially */
+  width: 260px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: right 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.character-wrap.visible {
+  right: 24px;
+}
+
+/* Speech bubble */
+.speech-bubble {
+  position: relative;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  padding: 12px 18px;
+  margin-bottom: 6px;
+  box-shadow: 4px 4px 0 var(--ink);
+  text-align: center;
+  min-width: 180px;
+  max-width: 240px;
+  opacity: 0;
+  transform: scale(0.6) translateY(20px);
+  transition: opacity 0.35s 0.55s ease, transform 0.45s 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.character-wrap.visible .speech-bubble {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* bubble tail pointing down */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: var(--ink);
+}
+
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #fff;
+  z-index: 1;
+}
+
+.bubble-text {
+  display: block;
+  font-family: var(--font-manga);
+  font-size: 1.6rem;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.bubble-name {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--pink-1);
+  margin-top: 2px;
+  word-break: break-word;
+}
+
+/* Anime character image */
+.anime-char {
+  width: 230px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 18px rgba(255, 77, 141, 0.55));
+  animation: charBob 3s ease-in-out infinite;
+}
+
+@keyframes charBob {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ground shadow */
+.char-shadow {
+  width: 130px;
+  height: 18px;
+  background: radial-gradient(ellipse, rgba(255, 77, 141, 0.35) 0%, transparent 70%);
+  border-radius: 50%;
+  margin-top: -12px;
+}
+
+/* ── Wave animation on character image (arm wave) ── */
+.anime-char.waving {
+  animation: charWave 0.5s ease-in-out 4 alternate, charBob 3s 2s ease-in-out infinite;
+}
+
+@keyframes charWave {
+  from {
+    transform: rotate(-3deg) translateY(0);
+  }
+
+  to {
+    transform: rotate(3deg) translateY(-6px);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   CARD
+   ═══════════════════════════════════════════════ */
+.card {
+  position: relative;
+  z-index: 10;
+  width: min(460px, 90vw);
+  padding: 46px 42px 40px;
+  background: var(--card-bg);
+  border: 3px solid var(--pink-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: cardIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* manga panel corners  ╔ ╗ ╚ ╝ */
+.corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+
+.corner.tl {
+  top: -3px;
+  left: -3px;
+  border-width: 3px 0 0 3px;
+}
+
+.corner.tr {
+  top: -3px;
+  right: -3px;
+  border-width: 3px 3px 0 0;
+}
+
+.corner.bl {
+  bottom: -3px;
+  left: -3px;
+  border-width: 0 0 3px 3px;
+}
+
+.corner.br {
+  bottom: -3px;
+  right: -3px;
+  border-width: 0 3px 3px 0;
+}
+
+/* ── Logo ── */
+.logo-wrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+}
+
+.logo-icon {
+  font-size: 36px;
+  z-index: 2;
+  position: relative;
+  animation: sakuraSpin 6s linear infinite;
+}
+
+@keyframes sakuraSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.12);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.logo-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2.5px dashed var(--pink-1);
+  animation: ringRotate 8s linear infinite reverse;
+}
+
+@keyframes ringRotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Titles ── */
+.app-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+
+.title-jp {
+  font-family: var(--font-manga);
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  letter-spacing: 0.2em;
+  color: var(--pink-2);
+  text-shadow: 2px 2px 0 var(--blue-1);
+}
+
+.title-en {
+  font-family: var(--font-manga);
+  font-size: clamp(2.2rem, 6vw, 3rem);
+  letter-spacing: 0.12em;
+  background: linear-gradient(120deg, var(--gold), var(--pink-1), var(--blue-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  line-height: 1;
+  filter: drop-shadow(3px 3px 0 rgba(59, 76, 202, 0.6));
+}
+
+.app-subtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 300;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+/* ── Form ── */
+.form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 20px;
+}
+
+.input-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink-2);
+  font-family: var(--font-body);
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.name-input {
+  width: 100%;
+  padding: 14px 46px 14px 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 77, 141, 0.5);
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.name-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.name-input:focus {
+  background: rgba(255, 77, 141, 0.08);
+  border-color: var(--pink-1);
+  box-shadow: 0 0 0 3px rgba(255, 77, 141, 0.22), 3px 3px 0 var(--blue-1);
+}
+
+.input-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── Greet button ── */
+.greet-btn {
+  position: relative;
+  width: 100%;
+  padding: 15px 28px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--pink-1) 0%, #ff8cb3 50%, var(--blue-2) 100%);
+  color: #fff;
+  font-family: var(--font-manga);
+  font-size: 1.55rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-action-text {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.greet-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--blue-1);
+  filter: brightness(1.08);
+}
+
+.greet-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--blue-1);
+}
+
+.btn-shine {
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-20deg);
+}
+
+.greet-btn:hover .btn-shine {
+  animation: shineSweep 0.5s ease forwards;
+}
+
+@keyframes shineSweep {
+  to {
+    left: 160%;
+  }
+}
+
+/* ── Greeting output ── */
+.greeting-output {
+  min-height: 50px;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-manga);
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  text-shadow: 3px 3px 0 var(--pink-1), 5px 5px 0 var(--blue-1);
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.greeting-output.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── SFX tag (manga onomatopoeia) ── */
+.sfx-wrap {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.sfx {
+  font-family: var(--font-manga);
+  font-size: 1.35rem;
+  letter-spacing: 0.15em;
+  color: var(--pink-2);
+  text-shadow: 2px 2px 0 var(--blue-1);
+  opacity: 0;
+  transform: scale(0.5) rotate(-8deg);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sfx.pop {
+  opacity: 1;
+  transform: scale(1) rotate(-4deg);
+}
+
+/* ═══════════════════════════════════════════════
+   VOICE UI
+   ═══════════════════════════════════════════════ */
+
+/* ── Input wrapper: mic button inside ── */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.name-input {
+  padding-right: 54px;
+  /* room for mic btn */
+}
+
+/* Mic button */
+.mic-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 77, 141, 0.6);
+  background: rgba(255, 77, 141, 0.12);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  z-index: 2;
+  outline: none;
+  /* contain the pulse ring */
+  overflow: visible;
+}
+
+.mic-btn:hover {
+  background: rgba(255, 77, 141, 0.28);
+  border-color: var(--pink-1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.mic-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Listening state */
+.mic-btn.listening {
+  background: rgba(255, 77, 141, 0.35);
+  border-color: var(--pink-1);
+  box-shadow: 0 0 12px rgba(255, 77, 141, 0.6);
+}
+
+.mic-btn.listening .mic-icon {
+  animation: micWiggle 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes micWiggle {
+  from {
+    transform: rotate(-10deg);
+  }
+
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+/* Ripple pulse ring around mic */
+.mic-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--pink-1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mic-btn.listening .mic-pulse {
+  animation: micRipple 1s ease-out infinite;
+}
+
+@keyframes micRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* ── Voice status bar ── */
+.voice-status {
+  min-height: 22px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-top: 6px;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.voice-status:empty {
+  opacity: 0;
+}
+
+.voice-status.listening {
+  color: var(--pink-1);
+  animation: statusPulse 1s ease-in-out infinite alternate;
+}
+
+.voice-status.speaking {
+  color: var(--gold);
+}
+
+.voice-status.error {
+  color: #ff6b6b;
+}
+
+@keyframes statusPulse {
+  from {
+    opacity: 0.6;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Mute / voice toggle ── */
+.voice-controls {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.mute-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 77, 141, 0.4);
+  border-radius: 20px;
+  color: var(--pink-2);
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+  outline: none;
+}
+
+.mute-btn:hover {
+  background: rgba(255, 77, 141, 0.14);
+  border-color: var(--pink-1);
+}
+
+.mute-btn.muted {
+  color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mute-label {
+  pointer-events: none;
+}
+
+/* ── Speaking glow on character ── */
+.anime-char.speaking {
+  filter: drop-shadow(0 0 28px rgba(255, 215, 0, 0.85)) drop-shadow(0 0 8px rgba(255, 77, 141, 0.6));
+}
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+  .card {
+    padding: 32px 22px 28px;
+  }
+
+  .panel-tl,
+  .panel-br {
+    display: none;
+  }
+
+  .character-wrap {
+    width: 190px;
+  }
+
+  .anime-char {
+    width: 180px;
+  }
+
+  .character-wrap.visible {
+    right: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .character-wrap {
+    display: none;
+  }
+}
